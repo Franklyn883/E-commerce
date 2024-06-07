@@ -1,4 +1,5 @@
 import csv
+
 """A module that handles operations relating to products."""
 
 class Products:
