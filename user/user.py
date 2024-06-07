@@ -1,78 +1,123 @@
 from address import Address
+import datetime
+
+
+def set_user_address(user, street, local_govt, state, post_code):
+    """Set the user's address using the Address class."""
+    user.address = Address()
+    user.address.set_address(street, local_govt, state, post_code)
+
+
+last_id = 0
 
 
 class User:
     """A simple attempt to model a user."""
 
-    users = []
-
-    def __init__(self):
-        """Initiates the class attributes. Then Instantiate the Address class."""
-        self.user_address = Address()
-        self.isLoggedIn = False
-
-    def register_user(
-        self, first_name, last_name, email, address, phone_number=""
+    def __init__(
+        self, first_name, last_name, email, address, phone_number, password
     ):
-        """Register a new user. And add the newly register user to the users
-        list."""
-
+        """Initiates the class attributes. Then Instantiate the Address class."""
+        self.isLoggedIn = False
+        global last_id
+        last_id = +last_id
+        self.id = last_id
+        self.created_at = datetime.date.today()
         self.first_name = first_name
         self.last_name = last_name
         self.email = email
         self.address = address
         self.phone_number = phone_number
+        self.password = password
 
-        User.users.append(self)
+    def match(self, filter):
+        """Determines if a user's attributes matches the filter text.
+        Returns true if a match is found and false if not found.
+        It's case insensitive."""
+        filter = filter.lower()
 
-    def login(self):
-        """Set the IsloggedIn attribute to True."""
-        self.isLoggedIn = True
-
-    def logout(self):
-        """Set the IsloggedIn attribute to False."""
-        self.isLoggedIn = False
+        return (
+            filter in self.first_name.lower()
+            or filter in self.last_name.lower()
+            or filter in self.email.lower()
+        )
 
     def get_full_name(self):
         """Returns the first_and and the last_name of the user object."""
         full_name = self.first_name + " " + self.last_name
         return full_name.title()
 
-    def get_users(self):
-        """Returns the full names of users all the registered users."""
-        print("list of users:")
-        for user in User.users:
 
-            print("\t" + user.get_full_name())
+class UserManager:
+    """Represent a collections of users. It handles user creation and
+    modification."""
 
-    def get_number_of_users(self):
-        """Returns the number of users registered users."""
-        return len(User.users)
+    def __init__(self):
+        """Initialize a list of users."""
 
+        self.users = []
+        self.current_user = None
 
-new_user = User()
-user_2 = User()
-user_2.register_user(
-    first_name="favor",
-    last_name="Iyoha",
-    address=user_2.user_address.set_address(
-        state="edo",
-        local_govt="oredo",
-        street="no 6a, ohonre street",
-        post_code="4556",
-    ),
-    email="favorgodwin@gmail.com",
-    phone_number="08163953883",
-)
-new_user.register_user(
-    "frank", "alimimian", "frankyngood@gmail.com", "edo state."
-)
-print(new_user.__dict__)
-print(new_user.get_full_name())
-new_user.get_users()
-print(new_user.get_number_of_users())
-address_info = user_2.user_address.get_full_address()
-print(address_info)
-print(user_2.isLoggedIn)
-user_2.login()
-print(user_2.isLoggedIn)
+    def create_user(
+        self,
+        first_name,
+        last_name,
+        password,
+        confirm_password,
+        phone_number=None,
+        email=None,
+        address=None,
+    ):
+        """Creates a new user. Checks if the password matches the confirm password before adding to list."""
+        if password == confirm_password:
+            user = User(
+                first_name, last_name, email, phone_number, address, password
+            )
+            self.users.append(user)
+        else:
+            return "Password and confirm password does not match."
+
+    def login(self, email, password):
+        """Logs in user if the password and email matches. 
+        Then set the current user to the user."""
+
+        for user in self.users:
+            if user.email == email and user.password == password:
+                user.isLoggedIn = True
+                self.current_user = user
+                return True
+            return False
+
+    def _find_user(self, user_id):
+        """Searches for a user with a given id."""
+        for user in self.users:
+            if str(user_id) == str(user.id):
+                return user
+        return None
+
+    def modify_first_name(self, first_name, user_id):
+        """Find a user with the given id and replace the first_name with
+        the given value"""
+        user = self._find_user(user_id)
+        if user:
+            user.first_name = first_name
+            return True
+        return False
+
+    def modify_last_name(self, last_name, user_id):
+        """Find a user with the given id and replace the last_name with
+        the given value"""
+        user = self._find_user(user_id)
+        if user:
+            user.last_name = last_name
+            return True
+        return False
+
+    def modify_last_name(self, last_name, user_id):
+        """Find a user with the given id and replace the last_name with
+        the given value"""
+        user = self._find_user(user_id)
+        if user:
+            user.last_name = last_name
+            return True
+        return False
