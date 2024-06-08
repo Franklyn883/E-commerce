@@ -2,7 +2,7 @@ class Address:
     """A simple model of users address."""
 
     def set_address(self, street, local_govt, state, post_code):
-        """Set the values of the attributes."""
+        """Set the values of the attributes. And create a new Address obj."""
         self.street = street
         self.local_govt = local_govt
         self.state = state

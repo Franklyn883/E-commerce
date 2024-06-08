@@ -11,7 +11,7 @@ import datetime
 
 
 def set_user_address(user, street, local_govt, state, post_code):
-    """Set the user's address using the Address class."""
+    """Instantiate the Address class, and set the given user's address using the Address class."""
     user.address = Address()
     user.address.set_address(street, local_govt, state, post_code)
 
@@ -29,7 +29,7 @@ class User:
         self.isLoggedIn = False
         global last_id
         last_id = +last_id
-        self.id = last_id
+        self.user_id = last_id
         self.created_at = datetime.date.today()
         self.first_name = first_name
         self.last_name = last_name
@@ -58,7 +58,7 @@ class User:
 
 class UserManager:
     """Represent a collections of users. It handles user creation and
-    modification."""
+    modification and other actions relating to the user class."""
 
     def __init__(self):
         """Initialize a list of users."""
@@ -97,8 +97,8 @@ class UserManager:
         return True
 
     def login(self, email, password):
-        """Logs in user if the password and email matches.
-        Then set the current user to the user."""
+        """Logs in user if the password and email matches any of the password and email in the user collection.
+        Then set the  user as the current_user."""
 
         for user in self.users:
             if user.email == email and user.password == password:
@@ -108,30 +108,28 @@ class UserManager:
             return False
 
     def show_profile(self):
-        """Display a user's information."""
+        """Display a user's information in a formatted strings."""
         user = None
         user_info = None
 
         if self.current_user and self.current_user.isLoggedIn:
-            user = "{0} {1}".format(
-                self.current_user.first_name.title(),
-                self.current_user.last_name,
-            )
-            user_info = ("\tFirst Name : {0}\n\tLast Name: {1}\n").format(
+            user = self.current_user.get_full_name()
+            user_info = ("\tFirst Name : {0}\n\tLast Name: {1}\n\tDate join: {2}\n").format(
                 self.current_user.first_name.title(),
                 self.current_user.last_name.title(),
+                self.current_user.created_at
             )
 
             if self.current_user.email:
-                user_info += "\n\tEmail{0}".format(
-                    self.current_user.email.title()
+                user_info += "\n\tEmail: {0}".format(
+                    self.current_user.email
                 )
             if self.current_user.phone_number:
-                user_info += "\n\tPhone Number: {0}".format(
+                user_info += "\n\tPhone Number: {0}\n".format(
                     self.current_user.phone_number
                 )
             if self.current_user.address:
-                user_info += "\n\tAddress: \n\t\tStreet: {0}\n\t\tL.G.A: {1}\n\t\tState: {2}\n\t\tPostal Code: {3}".format(
+                user_info += "\n\tAddress: \n\t\tStreet: {0}\n\t\tL.G.A: {1}\n\t\tState: {2}\n\t\tPostal Code: {3}\n".format(
                     self.current_user.address.street.title(),
                     self.current_user.address.local_govt.title(),
                     self.current_user.address.state.title(),
@@ -174,17 +172,16 @@ class UserManager:
         return False
 
     def change_password(self, new_password, old_password):
-        """Changes the password of the current users, if the new password
-        matches the old password."""
+        """Change the password of the current user, if the old password matches with the new password, then return True, return False otherwise."""
 
         if self.current_user and self.current_user.isLoggedIn:
             if self.current_user.password == old_password:
                 self.current_user.password = new_password
-            return True
+                return True
         return False
 
     def set_address(self, street, local_govt, state, post_code):
-        """Set the user's address."""
+        """Set the user's address, and return True."""
         if self.current_user and self.current_user.isLoggedIn:
             user = self.current_user
             set_user_address(user, street, local_govt, state, post_code)
