@@ -28,7 +28,7 @@ class User:
         """Initiates the class attributes. Then Instantiate the Address class."""
         self.isLoggedIn = False
         global last_id
-        last_id = +last_id
+        last_id += last_id
         self.user_id = last_id
         self.created_at = datetime.date.today()
         self.first_name = first_name
